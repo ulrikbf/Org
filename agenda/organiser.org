@@ -1,0 +1,25 @@
+* Projects
+** Streamer.j
+- [ ] Port code to babel
+- [ ] Figure out what to do next with the HTML in index2.html.
+- [ ] Review.
+
+* Inbox
+
+** TODO Rydde stua						      :@home:
+
+** TODO Rydde rommet.						      :@home:
+- [ ] Re opp senga.
+- [ ] Sortere klær.
+
+** TODO Handle organiseringsutstyr på Clas Ohlson.		   :@errands:
+
+** TODO Trene							 :highenergy:
+   - [ ] Trene Bryst
+   - [ ] Trene Rygg
+   - [ ] Trene armer
+
+** TODO Handle							   :@errands:
+   - [ ] Lage handlelist.
+   - [ ] Gå på butikken.
+   - [ ] Sette inn varer.

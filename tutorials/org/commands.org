@@ -1,0 +1,176 @@
+
+* Overview of commands in Org mode. This is a short list of the tutorial [[file+sys:/home/ulrikbf/Org/tutorials/org/basic.org][basic.org]]
+
+Before we begin, one of the most important commands that is relevant in almost all aspects of
+Org mode, is the search-function and the export function. 
+
+| Command | Action                          |
+|---------+---------------------------------|
+| C-c /   | Search and create sparse trees. |
+| C-c C-e | Opens the Export buffer         |
+|---------+---------------------------------|
+
+ 
+** Document Structure
+
+| Command   | Action                                            |
+|-----------+---------------------------------------------------|
+| TAB       | Cycle through folded, children and subtree.       |
+| Shift+TAB | Global folding/unfolding.                         |
+| Shift+Alt | Indenting item under cursor AND all items inside. |
+|-----------+---------------------------------------------------|
+
+** Motion
+
+| Command   | Action                                |
+|-----------+---------------------------------------|
+| C-c C-n   | Next heading                          |
+| C-c C-p   | Previous heading                      |
+| Alt+ENTER | Insert new heading at same level      |
+| C-S-ENTER | Insert TODO at the same heading       |
+| M-Left    | Promote current heading by one level. |
+| M-Right   | Demote current heading by one level.  |
+| M-Up      | Move heading up.                      |
+| M-S-ENTER | Insert a new item WITH a checkbox.    |
+| C-c C-x d | Insert a new drawer.                  |
+|-----------+---------------------------------------|
+
+** Lists
+
+| Commands     | Actions                                                          |
+|--------------+------------------------------------------------------------------|
+| C-c *        | Turn a plain list item into a headline.                          |
+| C-c C-*      | Turn the whole plain list into a subree of the curreint heading. |
+| S-left/right | Cycle bullet types.                                              |
+|--------------+------------------------------------------------------------------|
+
+** Drawers
+  
+| commands  | action                       |
+|-----------+------------------------------|
+| C-c C-x d | Insert a new drawer at point |
+|-----------+------------------------------|
+
+** Footnotes
+
+| Commands  | Actions                                                                                  |
+|-----------+-------------------------------------------------------------------------------------------|
+| C-c C-x f | The foonote action command. Jump to refrence or create a new footnote                     |
+| C-c C-c   | If the cursor is on a footnote refrence, jump to the definition. Can be used to jump back |
+|-----------+-------------------------------------------------------------------------------------------|
+
+** Tables
+
+| commands  | action                                          |
+|-----------+-------------------------------------------------|
+| C-c 'pipe | Convert active region to table.                 |
+| C-c C-c   | Re-align table and dont move to another field.  |
+| TAB       | Move to another column/field.                   |
+| M-S-left  | Kill column                                     |
+| M-S-right | Kill current column                             |
+| M-S-down  | Insert a new row above the current row          |
+| M-S-up    | Kill the current row or horizontal line         |
+| C-c -     | Insert a horizontal line below the current row. |
+|-----------+-------------------------------------------------|
+
+** Calculations
+
+| Commands | Actions                                                                                 |
+|----------+------------------------------------------------------------------------------------------|
+| C-c +    | Sum the numbers in the current column. The result is ECHO'd and can be inserted with C-y |
+| S-ENTER  | When current field is empty, copy from non-empty field above.                            |
+|----------+------------------------------------------------------------------------------------------|
+
+** Links
+
+| Commands        | Actions                                                              |
+|-----------------+----------------------------------------------------------------------|
+| C-c C-o         | Folow the link / open in browser.                                    |
+| C-c C-1         | Insert a link                                                        |
+| C-u C-c C-1     | ehh?                                                                 |
+| C-c C-1         | When cursor on existing link -> Edit the link and description parts. |
+| C-c C-x C-n/C-p | Move forward/backward to the next link in the buffer.                |
+|-----------------+----------------------------------------------------------------------|
+ 
+** TODO'
+
+| Commands  | Actions                                                        |
+|-----------+----------------------------------------------------------------|
+| C-c C-t   | Rotate the TODO state odf the current item(unmarked/todo/done) |
+| S-right   | Cycling states                                                 |
+| C-c a t   | Show the global TODO list from agenda files.                   |
+| S-M-ENTER | Insert a new TODO entry below the current one.                 |
+| C-c ,     | Set the priority of the current headline                       |
+| S-up/down | Increase/decrease priority.                                    |
+| C-c       | Evaluate the state of of completed tasks-checkbox.             |
+|-----------+----------------------------------------------------------------|
+
+** Checkboxes
+
+| Commands  | Actions                                            |
+|-----------+----------------------------------------------------|
+| C-c       | Evaluate the state of of completed tasks-checkbox. |
+| M-S-ENTER | Insert a new item with a checkbox                  |
+| C-c C-x o | Toggle the ORDERED property of the entry.          |
+|-----------+----------------------------------------------------|
+
+** Tags
+
+| Commands | Actions                                                         |
+|----------+-----------------------------------------------------------------|
+| C-c C-q  | Enter a new tag for the current headline.                       |
+| C-c C-c  | When the cursos is in a headline, this does the same as C-c C-q |
+|----------+-----------------------------------------------------------------|
+
+** Properties
+
+| Commands  | Actions                                                                                                |
+|-----------+--------------------------------------------------------------------------------------------------------|
+| C-c C-x p | Set a property. Prompots for a property name and value.                                                |
+| C-c C-c   | With cursor in a property drawer, execute property commands.                                           |
+| C-c C-c s | Set a property in the current entry. Both the property and the value can be inserted using completion. |
+| Searches  |                                                                                                        |
+|-----------+--------------------------------------------------------------------------------------------------------|
+| C-c /     | Create a sparse tree with all matching entries.                                                     |
+|-----------+-----------------------------------------------------------------------------------------------------|
+
+** Dates and times
+
+| Commands     | Actions                                                                                      |
+|--------------+----------------------------------------------------------------------------------------------|
+| C-c .        | Promt for a date and insert a corresponding timestamp. Also used to modify current timestamp |
+| C-c !        | Insert inactive timestamp thajt will not cause an agenda entry.                              |
+| S-left/right | Change date at curos by one day.                                                             |
+| C-c C-d      | Insert 'DEADLINE' keywoard along with a stamp.                                               |
+| C-c C-s      | Insert 'SCHEDULED' keywoard along with a stamp.                                              |
+|--------------+----------------------------------------------------------------------------------------------|
+
+** Agenda
+
+| Commands | Actions                                                                              |
+|----------+--------------------------------------------------------------------------------------|
+| C-c [    | Add current file to the list of agenda files. File is added to thef ront of the list |
+| C-C ]    | Remove current file from the list of agenda files.                                   |
+| C-'/,    | Cycle through agenda file list                                                       |
+| C-c a t  | Show the global TODO list                                                            |
+| C-c a T  | Same as above, but allows selection of specific TODO keyword.                        |
+|         |                                                                                      |
+|----------+--------------------------------------------------------------------------------------|
+
+*** Agenda buffer 
+
+| Commands | Actions                                                          |
+|----------+------------------------------------------------------------------|
+| n        | Next Line                                                        |
+| p        | Previous line                                                    |
+| N        | Next item                                                        |
+| P        | Previous item                                                    |
+| SPC      | Display the original location of the item in another window.     |
+| L        | Display the original location and recenter that window.          |
+| TAB      | Go to the original location of the item in another window        |
+| ENTER    | Go to the original location of the item and delte other windows. |
+|----------+------------------------------------------------------------------|
+
+
+
+

@@ -1,0 +1,687 @@
+#+STARTUP: hideblocks
+
+* Modules
+  These are the required modules that i have written myself, and not installed
+  through NPM.
+
+  The URL-parser is used to parse the incoming request from a client. It
+  will analyse the incoming request and disect 
+
+* Server.js
+:PROPERTIES: 
+:header-args: :tangle ~/mnt/Streamer2.0/server.js :mkdirp yes
+:END:
+  
+#+NAME server 
+#+BEGIN_SRC js
+  var route = require('./router.js');
+  var fs = require('fs');
+
+  require('http').createServer(function(req, res) {
+
+      route.router(res,req, function(err,res){
+      
+          res.end();
+      });   
+      
+
+  }).listen(4000);
+#+END_SRC
+
+* Router.js
+:PROPERTIES: 
+:header-args: :tangle ~/mnt/Streamer2.0/router.js :mkdirp yes
+:END:
+  
+The router is responisple for "routing" requests to the right resources.
+If a user request's something wia URL, it will be routed through the router
+and handled with the appropriate ~requestHandler~.
+
+A list of modules that will be used in Router.js.  
+The modules are essential pieces of code that gives the router the capabilities
+to do what it needs to do!
+
+#+NAME Modules
+#+BEGIN_SRC js
+var fs = require('fs');
+var requestHandlers = require('./streamer.js');
+var path = require('path');
+var url = require('url');
+#+END_SRC
+
+The requesthandler is an array of functions that is imported from the module
+~streamer.js~. The requestHandler functions has the same name as URL's, and we execute
+the following functions depending on what URL has been requested. 
+
+#+NAME Requesthandlers
+#+BEGIN_SRC js
+var handle = {};
+handle['/'] = requestHandlers.index;
+handle['/streaming'] = requestHandlers.video;
+handle['/ajax'] = requestHandlers.ajax;
+handle['/getResource'] = requestHandlers.getResource;
+handle['/listEntry'] = requestHandlers.getEntries;
+/*<================****===============> */
+handle['public'] = requestHandlers.public;
+
+#+END_SRC
+
+The module Router will be exported to the Server. 
+#+NAME Router
+#+BEGIN_SRC js
+var router = function(res, req){
+
+// url_parts will contain the different sections of the requested URL. like the protocol, the href, slashes, etc.
+// parts will contain the "data", like the &=?. All the "name" variables in HTML will be found in parts, e.o from Forms, etc.
+var url_parts = url.parse(req.url,true);
+var parts = url_parts.query;
+
+console.log("requestin: " + url_parts.pathname);
+console.log("Data: " + parts.intext);
+    try {
+       
+        // if the url PATH is the same name as a function, we will execute that function with the URL parts.
+        if (typeof handle[url_parts.pathname] === 'function') {
+            handle[url_parts.pathname](res,req,parts);
+
+         }else{
+            var dirname = path.dirname(decodeURI(req.url));
+            var basename = path.basename(decodeURI(req.url));
+            var fullPath = path.resolve(dirname,basename);
+            fullPath = "." + fullPath; 
+            console.log(fullPath);
+            
+            handle['public'](res, fullPath);
+         }           
+    }
+        catch(err) {
+            
+            console.log(err);
+        }
+
+}
+
+//Exports the "router" as a module for Server.js
+exports.router = router
+#+END_SRC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#+begin_src js :results output
+  console.log("heeeyyyyyJA.OHOH!");
+
+  console.log("I am running inside a source block, bebbeh!");
+#+end_src
+
+#+RESULTS:
+: heeeyyyyyJA.OHOH!
+: I am running inside a source block, bebbeh!
+
+#+begin_src js :results value
+  console.log("heeeyyyyyJA.OHOH!");
+
+  console.log("I am running inside a source block, bebbeh!");
+#+end_src
+
+#+RESULTS:
+: heeeyyyyyJA.OHOH!
+: I am running inside a source block, bebbeh!
+: undefined
+
+
+#+begin_src js :results session
+  console.log("heeeyyyyyJA.OHOH!");
+  var k = 0;
+  for(var i = 0; i < 10; i++) {
+      k+=i; 
+  }
+  console.log(k);
+  console.log("I am running inside a source block, bebbeh!");
+#+end_src
+
+#+RESULTS:
+: heeeyyyyyJA.OHOH!
+: 45
+: I am running inside a source block, bebbeh!
+: undefined
+
+#+RESULTS:
+
+:exports code
+The default in most languages. The body of the code block is exported, as described in Literal examples. 
+:exports results
+The code block will be evaluated each time to buffer is exported, and the results will be placed in the Org mode buffer for export, either updating previous results of the code block located anywhere in the buffer or, if no previous results exist, placing the results immediately after the code block. The body of the code block will not be exported. 
+:exports both
+Both the code block and its results will be exported. 
+:exports none
+Neither the code bloc 
+* Streamer.js 
+:PROPERTIES: 
+:header-args: :tangle ~/mnt/Streamer2.0/streamer.js :mkdirp yes
+:END:
+The Streamer-module contains all the functions that are exported to the requestHandler-object in the ~Router~.
+  
+The following modules will be imported.
+#+NAME modules
+#+BEGIN_SRC js
+var fs = require('fs');
+var url = require('url');
+var path = require('path');
+var exec = require('child_process').exec;
+
+var assert = require('assert');
+var MongoClient = require('mongodb').MongoClient;
+#+END_SRC
+
+** Requesthandlers/functions.
+The most important requestHandler is ~getPublic~. This function collects
+all the requests for the local resources like a javascript file or css file, it will be routed with this function.
+
+#+NAME Public 
+#+BEGIN_SRC js
+function getPublic(res,fullPath){
+    // Reades the fullPath piped in from router and opens/returns the file.
+    var file =  fs.createReadStream(fullPath);
+    res.writeHead(200,{'Content-type' : 'text/html'});
+    file.pipe(res);
+}
+#+END_SRC 
+
+The Index returns the */* of the site, also known as *root*. 
+#+NAME Index
+#+BEGIN_SRC js
+function getIndex(res){ 
+    
+    var options = {
+        pretty : true,
+        cache : true
+    };
+    
+    var path = "./view/index.html";
+    var file = fs.createReadStream(path) 
+    file.pipe(res);
+         
+}
+#+END_SRC
+
+The Resource returns items from the MongoDB database. The items will be converted to a JSON-string and sent to the front with AJAX.
+
+#+NAME Resource
+#+BEGIN_SRC js
+function getResource(res, req, parts){
+    var path = './public/resources/' + parts.link;
+
+    res.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin' : '*'
+    });
+
+var url = 'mongodb://192.168.1.215:27017/resources';
+MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  console.log("Connected correctly to server.");
+
+    var col = db.collection(parts.link);
+     col.find({},{title:1,_id:0}).toArray(function(err,docs){
+
+	 db.close();
+         console.log(docs);
+	 var results = JSON.stringify(docs);
+	    console.log(results);
+	 res.write(results);
+	 db.close();
+	 res.end();
+	});
+    });
+}
+#+END_SRC
+
+#+NAME Ajax
+#+BEGIN_SRC js
+function getAjax(res, req, parts){
+    
+        res.writeHead(200, {
+         'Content-Type': 'text/html',
+         'Access-Control-Allow-Origin' : '*'
+        });
+
+        
+        if(parts != undefined){
+            res.write("this is intext, baby!" + parts.link);
+            var parser = new urlParser(parts.link);
+
+            parser.on('parsed', function(data){
+
+                var stuff = exec(data.exec + data.url);
+                console.log("Complete: " + data.exec + data.url);
+
+                stuff.stderr.on('data',function(error){
+                console.log(error);
+                });
+
+                stuff.on('close',function(code){
+                    console.log("This is the closing code! " + code);
+                });
+            });
+        }
+    res.end("Hello WORLD!");
+}
+
+#+END_SRC
+
+#+NAME List Entries
+#+BEGIN_SRC js
+  function getEntries(res, req, parts){
+      var path = './public/resources/' + parts.collection;
+      
+      res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin' : '*'
+      });
+
+      var url = 'mongodb://192.168.1.215:27017/resources';
+      MongoClient.connect(url, function(err, db) {
+          assert.equal(null, err);
+          console.log("Connected correctly to server.");
+
+          var col = db.collection(parts.collection);
+          col.find({ title: parts.title }).toArray(function(err,docs){
+
+              db.close();
+              console.log(docs);
+              var results = JSON.stringify(docs);
+              console.log(results);
+              res.write(results);
+              db.close();
+              res.end();
+          });
+      });
+  }
+#+END_SRC
+
+The functions who are exported and imported in the ~router~.
+#+NAME Exports
+#+BEGIN_SRC js
+exports.index = getIndex;
+exports.ajax = getAjax;
+exports.public = getPublic;
+exports.getResource = getResource;
+exports.getEntries = getEntries;
+#+END_SRC
+
+
+* Public
+  
+The public folder contains all the files which are available to the client from the internet, except the site itself.
+This is resources like javascript, stylesheets, images and more.
+
+** list-category 
+
+
+Funksjonen ~listResource~ blir trigget når man trykker på kategorien i index.html
+Den tar med seg ID-en fra kategori elementet, feks /movies/,/ebooks/, etc og henter
+ut de respektive recordsa fra mongoDB.
+
+#+NAME List Resource
+#+BEGIN_SRC js :tangle ~/mnt/Streamer2.0/public/js/getResources.js :mkdirp yes
+var globalObject = {};
+  function listResource(id){
+      var element_id = id; // 'movies, series, ebooks, etc'.
+      var jsonObj = "";
+      var ul = document.getElementsByClassName('content-list')[0];
+
+      //test
+      xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("GET","http://192.168.1.215:4000/getResource?link="+ element_id, true);
+      xmlhttp.onreadystatechange=function(){
+                 if (xmlhttp.readyState==4 && xmlhttp.status==200){
+                     var resp = xmlhttp.responseText;
+                     jsonObj = JSON.parse(resp);
+
+                          for(var i = 0; i < jsonObj.length; i++) {
+                              var obj = jsonObj[i];
+
+                         var span_type = document.createElement("SPAN");
+                         var span = document.createElement("SPAN");
+                         
+                              span_type.className += " content-list-span";
+                              span.className += " clear-float";
+
+                              var li = document.createElement("LI");
+                              var title = obj.title;
+                              globalObject.title = obj.title;
+                              globalObject.id = element_id;
+                              li.onclick = function(){
+ 
+                                  listEntry(globalObject.id,globalObject.title);
+                              };
+
+                              li.className = "list";
+                              var textObj = document.createTextNode(obj.title);
+                              var textType = document.createTextNode(id);
+                              span_type.appendChild(textType);
+                              span.appendChild(textObj);
+                         
+                         li.appendChild(span_type);
+                         li.appendChild(span);
+                         ul.appendChild(li);
+                         }
+                  }
+      }
+      xmlhttp.send();
+  }
+#+END_SRC
+
+** list-entry
+#+NAME List entry
+#+BEGIN_SRC js :tangle ~/mnt/Streamer2.0/public/js/getResources.js :mkdirp yes
+
+    function listEntry(id, title){
+        var element_id = id; // 'movies, series, ebooks, etc'.
+        var jsonObj = "";
+        var ul = document.getElementsByClassName('content-list')[0];
+        ul.innerHTML = "";
+alert("list entry, baby!");
+
+        //test
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET","http://192.168.1.215:4000/listEntry?collection="+ element_id + "&title=" + title, true);
+        xmlhttp.onreadystatechange=function(){
+                   if (xmlhttp.readyState==4 && xmlhttp.status==200){
+                       var resp = xmlhttp.responseText;
+                       jsonObj = JSON.parse(resp);
+
+                            for(var i = 0; i < jsonObj.length; i++) {
+                                var obj = jsonObj[i];
+
+                           var span_type = document.createElement("SPAN");
+                           var span = document.createElement("SPAN");
+                           
+                           span_type.className += " content-list-span";
+                           span.className += " clear-float";
+
+                           var li = document.createElement("LI");
+                           li.className = "list";
+                           var textObj = document.createTextNode(obj.title);
+                           var textType = document.createTextNode(id);
+                           span_type.appendChild(textType);
+                           span.appendChild(textObj);
+                           
+                           li.appendChild(span_type);
+                           li.appendChild(span);
+                           ul.appendChild(li);
+                           }
+                    }
+        }
+        xmlhttp.send();
+    }
+#+END_SRC
+** CSS
+
+#+NAME index.css
+#+BEGIN_SRC css :tangle ~/mnt/Streamer2.0/public/style/index.css :mkdirp yes
+body{
+    margin: 0;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 15px;
+    line-height: 20px;
+    color: #586e75;
+    background-color: #fdf6e3;
+}
+ul {
+    padding:0;
+    list-style-type: none;
+}
+/* Tags */
+
+
+
+/* Classes */
+
+.sidebar {
+    width: 290px;
+    background: #eee8d5;
+    position: fixed;
+    height: 100%;
+    top: 0;
+}
+.title{
+    font-size: 38px;
+    font-weight: normal;
+    text-align: center;
+    line-height: 64px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.categories {
+    margin: 0;
+    margin-top: 35px;
+    text-align:center;
+}
+.category{
+    list-style-type: none;
+    line-height: 50px;
+    padding: 0;
+    margin-bottom: 1px;
+    border-left: 10px solid;
+    border-radius: 0;
+    font-size: 18px;
+}
+
+.icons {
+    color: rgba(88,110,117,0.8);
+    font-size: 18px;
+    width: 60px;
+    text-align: center;
+}
+.movies {
+    border-left-color: #dc322f;
+    
+}
+.series {
+    border-left-color: #268bd2;
+    
+}
+.educational {
+    border-left-color: #859900;
+    
+}
+.podcasts {
+    border-left-color: #6c71c4;
+    
+}
+.ebooks {
+    border-left-color: #b58900;
+    
+}
+.content{
+    margin-top: 10px;
+    margin-left:340px;
+}
+.search-container {
+    font-size: 40px;
+    height: 64px;
+    margin-top: 8px;
+    position: relative;
+}
+.search {
+
+    box-sizing: border-box;
+    width: 100%;
+    padding-bottom: 0;
+    margin-top: 7px;
+    margin-left: 0;
+    height: 50px;
+    line-height: 44px;
+    border-radius: 0;
+    border: none;
+    background-color: rgba(255,255,255,0.9);
+    font-size: 30px;
+    font-weight: 300;
+    opacity: 0.6;
+
+    webkit-box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    -moz-box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+
+}
+.below-search-container {
+    margin-top: 5px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: #93a1a1
+}
+.content-list-container {
+    position: relative;
+    min-height: 600px;
+}
+.content-list {
+    padding: 0;
+}
+.list {
+    position: relative;
+    list-style-type: none;
+    background-color: #eee8d5;
+    margin-bottom: 10px;
+    line-height: 20px;
+    height:5%;
+}
+.page-container{
+    margin-left: auto;
+    margin-right: auto;
+    width:1140px;
+    overflow:hidden;
+    
+}
+.content-list-span{
+  width:10%;
+  float:left;
+}
+.clear-float{
+  float:clear;
+}
+
+/* class childs */
+
+.title span:first-child{
+    color:#2aa198;
+}
+
+.category:hover{
+    background-color: #e2dfcd;
+}
+
+/* #ID's!*/
+
+#santja{
+    width: 20%;
+    background-color:blue;
+}
+#+END_SRC
+
+* MongoDB
+  
+Databse model for resources in MONGODB:
+
+The following structure embeds the "entries" into the object itself. Each entry will in the example, be a new podcast file.
+#+BEGIN_SRC 
+{
+   title: "MongoDB: The Definitive Guide",
+   creation_date: new Date(), 
+   category: "none",
+   files: {
+              name: "O'Reilly Media",
+              type: "mp4",
+              size: "320mb",
+	      location: "/path/to/santja.mp4"
+            }
+}
+#+END_SRC
+
+Here we see the output of some simple queries from the mongo-shell.
+#+BEGIN_SRC 
+db.podcasts.find({},{title:1, _id:0})
+{ "title" : "MongoDB: The Definitive Guide" }
+{ "title" : "jasskis" }
+
+> db.podcasts.find()
+{ "_id" : ObjectId("55febdf712962b092faee966"), "title" : "MongoDB: The Definitive Guide", "creation_date" : ISODate("2015-09-20T14:08:55.504Z"), "category" : "none", "files" : { "name" : "O'Reilly Media", "type" : "mp4", "size" : "320mb", "location" : "/path/to/santja.mp4" } }
+{ "_id" : ObjectId("55febe0412962b092faee967"), "title" : "jasskis", "creation_date" : ISODate("2015-09-20T14:09:08.377Z"), "category" : "snaff", "files" : { "name" : "O'Reilly Media", "type" : "mp4", "size" : "320mb", "location" : "/path/to/santja.mp4" } }
+#+END_SRC
+
+* View
+
+The View folder contains all the resources that the client will se, like the HTML page.
+
+** Index
+
+#+NAME The Index
+#+BEGIN_SRC html :tangle ~/mnt/Streamer2.0/view/index.html :mkdirp yes
+<html>
+    <head>
+      <title>wtf</title>
+	<link rel="stylesheet" type="text/css" href="./public/style/index.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<script src="./public/js/getResources.js"></script>
+    </head>
+    <body>
+
+      <div class="page-container">
+      <div class="sidebar"> 
+	<h1 class="title"><span>M-x</span><span> Butterfly</span></h1>
+	<ul class="categories">
+	  <li onclick="listResource(this.id)" id="movies" class="category movies">Movies</li>
+	  <li onclick="listResource(this.id)" id="series" class="category series">Series</li>
+	  <li ionclick="listResource(this.id)" d="category" class="category educational">Educational</li>
+	  <li onclick="listResource(this.id)" id="podcasts" class="category podcasts">Podcasts</li>
+	  <li onclick="listResource(this.id)" id="ebooks" class="category ebooks">eBooks</li>
+      </div>
+      <a href="/streaming">Something is happening, baby!</a>
+
+      <div class="content">
+	<div class="search-container">
+	  <input type="text" class="search" placeholder=" /([A-Z)\/g Search">
+	</div>
+	<div class="below-search-container">
+	</div>
+	<div class="content-list-container">
+	  <ul class="content-list">
+	    <li class="list"><div id="santja">sntj</div></li>
+	    <li class="list">qweqw</li>
+	    <li class="list">qweqw</li>
+	    <li class="list">qweqw</li>
+	    <li class="list">qweqw</li>
+	    </ul>
+	</div>
+      </div>
+
+      <!--> End of pager-container -->
+      </div>
+    </body>
+</html>
+#+END_SRC
+
+   
+
+   
+* TODO's

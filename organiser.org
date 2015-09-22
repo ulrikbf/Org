@@ -1,0 +1,10 @@
+
+* Inbox
+
+
+* Tasks
+  
+
+** DONE sadsd
+   CLOSED: [2015-09-20 Sun 00:32]
+   - State "DONE"       from "CANCELLED"  [2015-09-20 Sun 00:32]

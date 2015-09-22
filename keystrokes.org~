@@ -1,0 +1,32 @@
+
+* Windows 
+  |------------------------+-------|
+  | Command                | Key   |
+  |------------------------+-------|
+  | (split-window-below)   | C-x 2 |
+  | (split-window-right)   | C-x 3 |
+  | (delete-other-windows) | C-x 1 |
+  | (delete-window)        | C-x 0 |
+  | (other-window)         | C-x o |
+  |------------------------+-------|
+
+* Panes
+  |----------------------------------+---------------------------------------+-------|
+  | Info                             | Command                               | Key   |
+  |----------------------------------+---------------------------------------+-------|
+  | Increase Height                  | (enlarge-window)                      | C-x ^ |
+  | Decrease Height                  | (shrink-window)                       |       |
+  | Increase Width                   | (enlarge-window-horizontally)         | C-x } |
+  | Decrease Width                   | (shrink-window-horizontally)          | C-x { |
+  | Shrink window to fit its content | (shrink-window-if-larger-than-buffer) | C-x - |
+  | Make all windows same height     | (balance-windows)                     | C-x + |
+  |----------------------------------+---------------------------------------+-------|
+
+* Buffers
+
+  |---------------------+-------------------+-----------|
+  | Info                | Command           | Key       |
+  |---------------------+-------------------+-----------|
+  | List buffers        | (list-buffers)    | C-x b C-b |
+  | Switching to buffer | (switch-to-buffer | C-x b     |
+  |---------------------+-------------------+-----------|

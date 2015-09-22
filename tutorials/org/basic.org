@@ -1,0 +1,353 @@
+
+| commands | action                          |
+|----------+---------------------------------|
+| C-c /    | Search and create sparse trees. |
+|          |                                 |
+   
+
+* Documenture Strucutre
+** TAB -> FOLDED-->CHILDREN-->SUBTREE
+** SHIFT+TAB -> GLOBAL FOLDING
+** Shift+ALT -> Indenting the Element and ALL elements inside.
+
+* Motion
+
+** Next heading -> C-c C-n
+** Previous heading C-c C-p
+** Insert new heading --> ALT+ENTER
+** Insert TODO at same heading --> C-S-ENTER
+
+** Promote current heading by one level --> M-left
+
+** Demote current heading by one level --> M-right 
+
+** Move heading up --> M-up
+
+** Insert a new item with a checkbox --> M-S-ENTER
+
+** Insert new drawer --> C-c C-x d
+
+You can also add rich features to the text, like *bold*, /italic/, 
+_underline_ , =Verbatim= , ~Code~ and +strike-through+. 
+
+You also have comments.
+# this is a comment and will not be exported. 
+Though, #this is not a comment, since i dident start the line with #.
+** COMMENT this is also a comment, just written with a different syntax. 
+# Comments will NOT be exported.
+
+* Lists
+  Org has lists, unordered lists and descrpition lists.
+  
+  * Unordered list items start with '-', '+' or * as bullets.
+    1) Orderer list items start with '1.' or '1)'.
+       - Description list items are unordered list items, and contain the seperator ' :: ' to distinguish the descrpition term from the description.
+
+    | commands     | action                                                           |
+    |--------------+------------------------------------------------------------------|
+    | C-c *        | turn a plain list item into a headline                           |
+    | C-c C-*      | Turn the whole plain list into a subree of the curreint heading. |
+    | S-left/right | Cycle bullet types.                                              |
+    |              |                                                                  |
+
+* Drawers
+  Sometimes you want to keep information associated with an entry, but you normally
+  dont want to see it. For this, Org mode has drawers.
+  :DRAWR:
+  i am inside the drawer, bitches, I am chess.
+  :END:
+
+    | commands  | action                       |
+    |-----------+------------------------------|
+    | C-c C-x d | Insert a new drawer at point |
+    |           |                              |
+
+* Blocks
+  Org mode uses begin/end blocks for various purposes from including source code examples
+  to capturing time logging information.
+
+  You can start a code block like this:
+    #+BEGIN_SRC sh
+    echo "Hello world!"
+    #+END_SRC
+  and when you export it, it will have a nice HTML-box around it.
+  
+  If you have BABEl installed, it can be evaluated.
+
+ | Commands | Actions                                   |
+ | C-c C-c  | Evaluate inside code block(requires babel |
+ |----------+-------------------------------------------|
+ 
+ with babel :
+ 
+    #+BEGIN_SRC sh :exports both
+    echo "Hello world!"
+    #+END_SRC
+ 
+    #+results:
+    : Hello world
+
+ Note, you need ":exports both" to export both the SRC and the *results*.
+ 
+ You also have "easy templates" in babel.
+
+| s | #+BEGIN_SRC ... #+END_SRC         |
+| e | #+BEGIN_EXAMPLE ... #+END_EXAMPLE |
+| q | #+BEGIN_QUOTE ... #+END_QUOTE     |
+| v | #+BEGIN_VERSE ... #+END_VERSE     |
+| c | #+BEGIN_CENTER ... #+END_CENTER   |
+| l | #+BEGIN_LaTeX ... #+END_LaTeX     |
+| L | #+LaTeX:                          |
+| h | #+BEGIN_HTML ... #+END_HTML       |
+| H | #+HTML:                           |
+| a | #+BEGIN_ASCII ... #+END_ASCII     |
+| A | #+ASCII:                          |
+| i | #+INDEX: line                     |
+| I | #+INCLUDE: line                   |
+
+* Footnotes 
+  Org mode supports the creation of footnotes. A footnote as started by a footnote-marker
+  in square brackets in column 0, no intendation allowed. Example:
+  The org homepage[fn:1] looks pretty damn good now[fn:2]!
+
+    | commands  | action                                                                                    |
+    |-----------+-------------------------------------------------------------------------------------------|
+    | C-c C-x f | The foonote action command. Jump to refrence or create a new footnote                     |
+    | C-c C-c   | If the cursor is on a footnote refrence, jump to the definition. Can be used to jump back |
+    |           |                                                                                           |
+
+* Tables 
+  Org comes with a fast and intuitive table editor. Spreadsheet-like calculations are supported using 'Emacs calc'.
+  You start creating tables by typing '|'. Tables are realigned automaticaly by pressing TAB or ENTER.
+  Pressing |- wil create a line in the table. 
+
+
+    | commands  | action                                          |
+    |-----------+-------------------------------------------------|
+    | C-c 'pipe | Convert active region to table.                 |
+    | C-c C-c   | Re-align table and dont move to another field.  |
+    | TAB       | Move to another column/field.                   |
+    | M-S-left  | Kill column                                     |
+    | M-S-right | Kill current column                             |
+    | M-S-down  | Insert a new row above the current row          |
+    | M-S-up    | Kill the current row or horizontal line         |
+    | C-c -     | Insert a horizontal line below the current row. |
+    |           |                                                 |
+    
+** Calculations
+   
+   | commands | action                                                                                   |
+   |----------+------------------------------------------------------------------------------------------|
+   | C-c +    | Sum the numbers in the current column. The result is ECHO'd and can be inserted with C-y |
+   | S-ENTER  | When current field is empty, copy from non-empty field above.                            |
+
+
+* Hyperlinks
+  Like HTML, org provides links inside a file, external links to other files and much more!
+  Org will recognize plain URL-like links and activate them as clickable links. The general link format looks
+  like this [[] []] where the first bracket is the link and the second is the description. You only need the first.
+
+  
+** Internal links
+   If the link does not look like a URL, it is considered to be internal in the current file. The most important
+   case is the link like '[[#my-custom-id] ]' which will link tot he entry with the CUSTOM_ID property 
+   'my-custom-id'. The ID's must be unique.
+   [[#sntj]]
+
+   | Commands        | Actions                                                              |
+   |-----------------+----------------------------------------------------------------------|
+   | C-c C-o         | Folow the link / open in browser.                                    |
+   | C-c C-1         | Insert a link                                                        |
+   | C-u C-c C-1     | ehh?                                                                 |
+   | C-c C-1         | When cursor on existing link -> Edit the link and description parts. |
+   | C-c C-x C-n/C-p | Move forward/backward to the next link in the buffer.                |
+   |                 |                                                                      |
+
+
+* TODO'
+  By defaukt TIDI entries have only two states: TODO and DONE. Org mode allows you to classify TODO items in more complex ways
+  with TODO keywords (stored in org-todo-keywords). With special setypm the TODO keywoard can work differently
+  in different files.
+  
+  Example of customization:
+  
+  (setq org-todo-keywords
+  '((sequence "TODO" "FEEDBACK" "VERIFY" "|" "DONE "DELEGATED"")))
+  
+  
+  | Commands  | Actions                                                        |
+  |-----------+----------------------------------------------------------------|
+  | C-c C-t   | Rotate the TODO state odf the current item(unmarked/todo/done) |
+  | S-right   | Cycling states                                                 |
+  | C-c a t   | Show the global TODO list from agenda files.                   |
+  | S-M-ENTER | Insert a new TODO entry below the current one.                 |
+  | C-c ,     | Set the priority of the current headline                       |
+  | S-up/down | Increase/decrease priority.                                    |
+  | C-c       | Evaluate the state of of completed tasks-checkbox.             |
+  |           |                                                                |
+
+** Setting up keywords for individial files
+   #+ TODO: TODO FEEDBACK VERIFY | DONE
+   
+
+** Faces for TODO keywords
+   Org mode highlits TODO keywords with special faces: org-todo. 
+   Customise example:
+   (setq org-todo-keyword-faces
+   '(("TODO" . org-warning) ("STARTED" . "yellow")
+    ("CANCELED" . (:foreground "blue" :weight bold))))
+    
+    
+** Progress logging
+   Org mode can automatically record a timestamp and possibly a note whne you mark a TODO item as DONE, or even each time
+   you change the state of a TODO item. Highly configurable.
+
+   The most basic logging is to keep track of WHEN a certain TODO item was finished. This is achieved with
+
+   (setq org-log-done 'time)
+   
+   Each time you turn an entry from a TODO state into any of the DONE states, a line 'CLOSED: timestamp) will be 
+   inserted jsut after the headline.
+   
+** Checkboxes
+   Every item in a plain list can be made into a checkbox by staring it with the string '[]'. Use C-c C-c to check
+   or uncheck them.
+   
+  | Commands  | Actions                                            |
+  |-----------+----------------------------------------------------|
+  | C-c       | Evaluate the state of of completed tasks-checkbox. |
+  | M-S-ENTER | Insert a new item with a checkbox                  |
+  | C-c C-x o | Toggle the ORDERED property of the entry.          |
+
+
+* TAGS
+  Implementing contexts for cross-correlating information is to assign tags to headlines. Org mode has extensitve
+  support for tags. Every headline can contain a list of tags, they occur at the END of the headline.
+  
+  You can define tags in "org-tag-alist" or you can use the property for local file TAGS. 
+  #+TAGS: @WORK @SANTJA @FANTJA
+  #+TAGS: eat sniff snaff griff
+  
+  #Elisp
+  (setq org-tag-alist '(("@work . ?w") ("@home" . ?h) ("laptop" . ?1)))
+
+  | Commands | Actions                                                         |
+  |----------+-----------------------------------------------------------------|
+  | C-c C-q  | Enter a new tag for the current headline.                       |
+  | C-c C-c  | When the cursos is in a headline, this does the same as C-c C-q |
+  |          |                                                                 |
+
+
+* Properties and colums
+  A property is a key-value pair associated with an entry. Proeprties can be set so they are associvated with a
+  single entry, with every entry in a tree or with every entry in an org Org file. Properties use a special
+  drawer.
+
+  Properties are like tags, but with values. Keys are case-sensisitve. 
+  Example:
+  
+** CD COLLECTION
+*** Goldberg Variations
+    :PROPERTIES:
+    :Title: santja
+    :Artist: fantja
+    :END:
+
+    | Commands  | Actions                                                                                                |
+    |-----------+--------------------------------------------------------------------------------------------------------|
+    | C-c C-x p | Set a property. Prompots for a property name and value.                                                |
+    | C-c C-c   | With cursor in a property drawer, execute property commands.                                           |
+    | C-c C-c s | Set a property in the current entry. Both the property and the value can be inserted using completion. |
+    | Searches  |                                                                                                        |
+    |-----------+--------------------------------------------------------------------------------------------------------|
+    | C-c /     | Create a sparse tree with all matching entries.                                                     |
+
+
+
+
+
+
+* Dates and times
+  To assist project planning Org mode includes timestamps.
+
+** Timestamps, deadlines and scheduling.
+   Plain timestamp;Event;Appouintment
+   A simple timestamp just assigns a date/time to an item.
+   
+   Timestamp with repeater interval
+   A timestamp may contain a repeater interval, indicating that it applies not only to the given date,
+   but again and again after a certain interval. (d) days (w) (m) months (y) years.
+   
+   diary-style sexp entries
+   
+   Time/date range
+
+   Incative timestamp
+   
+
+   | Commands     | Actions                                                                                      |
+   |--------------+----------------------------------------------------------------------------------------------|
+   | C-c .        | Promt for a date and insert a corresponding timestamp. Also used to modify current timestamp |
+   | C-c !        | Insert inactive timestamp thajt will not cause an agenda entry.                              |
+   | S-left/right | Change date at curos by one day.                                                             |
+   | C-c C-d      | Insert 'DEADLINE' keywoard along with a stamp.                                               |
+   | C-c C-s      | Insert 'SCHEDULED' keywoard along with a stamp.                                              |
+   |              |                                                                                              |
+
+** Agenda Views
+   Due to the way Org works, TODO items, time-stamped items, and tagged headlines can be scattered throughout a file or even a number of files.
+   To get an overview of open action items, or of events are that important for a particular date, this information
+   must be collected, soirted and displayed in an organized way.
+
+   Org can select items based on various criteria and display them in a separate buffer.
+   Seven different view types are provided:
+
+   - an AGENDA that is like a calender and shows information for specific dates
+   - a TODO list that covers all unfinished action items
+   - a MATCH VIEW, showing headlines based on the tags, properties and TODO state associated with them.
+   - a TIMELINE VIEW that shows all events in a single ORg file, in a time-sorted view.
+   - TEXT SEARCH VIEW
+   - STUCK PROCJETS VIEW
+   - CUSTOM VIEWS, a combination of different views.
+
+
+** Agenda files
+   The information to be shown is normally collected from ALL agenda files, the files listed in the variable
+   org-agenda-files. If a directory is a part of this list, all files with the extension .org in this directory
+   will be a part of the list.
+   
+   Even if you work with only a single Org file, that file should be put into the list. You can customize org-agenda-files,
+   but the easiest way to maintain it is through the following commands
+
+   | Commands | Actions                                                                              |
+   |----------+--------------------------------------------------------------------------------------|
+   | C-c [    | Add current file to the list of agenda files. File is added to thef ront of the list |
+   | C-C ]    | Remove current file from the list of agenda files.                                   |
+   | C-'/,    | Cycle through agenda file list                                                       |
+   | C-c a t  | Show the global TODO list                                                            |
+   | C-c a T  | Same as above, but allows selection of specific TODO keyword.                        |
+   |         |                                                                                      |
+   |----------+--------------------------------------------------------------------------------------|
+   
+   Commands for the AGENDA buffer
+   
+   | Commands | Actions                                                          |
+   |----------+------------------------------------------------------------------|
+   | n        | Next Line                                                        |
+   | p        | Previous line                                                    |
+   | N        | Next item                                                        |
+   | P        | Previous item                                                    |
+   | SPC      | Display the original location of the item in another window.     |
+   | L        | Display the original location and recenter that window.          |
+   | TAB      | Go to the original location of the item in another window        |
+   | ENTER    | Go to the original location of the item and delte other windows. |
+ 
+* Footnotes
+[fn:1] the link is http://orgmode.org
+* #sntj								     :asdsad:
+* Export
+  You can export Org files to various different formants like html, latec
+  markdown and more.
+
+  | Command | Actions       |
+  | C-c C-e | Export buffer |
